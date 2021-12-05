@@ -26,49 +26,42 @@ namespace BooksApi.Controllers
             var book = _bookService.Get(id);
 
             if (book == null)
-            {
                 return NotFound();
-            }
-
-            return book;
+            else
+                return book;
         }
 
         [HttpPost]
-        public ActionResult<Book> Create(Book book)
+        public ActionResult<Book> Create(Book bookIn)
         {
-            _bookService.Create(book);
+            var book = _bookService.Create(bookIn);
 
-            return CreatedAtRoute("GetBook", new { id = book.Id.ToString() }, book);
+            if (book == null)
+                return Problem();
+            else
+                return CreatedAtRoute("GetBook", new { id = book.Id.ToString() }, book);
         }
 
         [HttpPut("{id:length(24)}")]
         public IActionResult Update(string id, Book bookIn)
         {
-            var book = _bookService.Get(id);
+            var book = _bookService.Update(id, bookIn);
 
             if (book == null)
-            {
                 return NotFound();
-            }
-
-            _bookService.Update(id, bookIn);
-
-            return NoContent();
+            else
+                return NoContent();
         }
 
         [HttpDelete("{id:length(24)}")]
         public IActionResult Delete(string id)
         {
-            var book = _bookService.Get(id);
+            var deleted = _bookService.Remove(id);
 
-            if (book == null)
-            {
+            if (!deleted)
                 return NotFound();
-            }
-
-            _bookService.Remove(book.Id);
-
-            return NoContent();
+            else
+                return NoContent();
         }
     }
 }

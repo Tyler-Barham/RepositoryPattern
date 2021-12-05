@@ -1,27 +1,25 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-// <snippet_NewtonsoftJsonImport>
 using Newtonsoft.Json;
-// </snippet_NewtonsoftJsonImport>
+using System.Runtime.Serialization;
 
 namespace BooksApi.Models
 {
-    public class Book
+    public class Book : Entity
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+        public override string Id { get; set; }
 
-        // <snippet_BookNameProperty>
         [BsonElement("Name")]
         [JsonProperty("Name")]
         public string BookName { get; set; }
-        // </snippet_BookNameProperty>
 
+        [DataMember]
         public decimal Price { get; set; }
 
+        [DataMember]
         public string Category { get; set; }
 
+        [DataMember]
         public string Author { get; set; }
     }
 }

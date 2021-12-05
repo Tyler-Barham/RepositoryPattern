@@ -1,9 +1,5 @@
-// <snippet_UsingBooksApiModels>
 using BooksApi.Models;
-// </snippet_UsingBooksApiModels>
-// <snippet_UsingBooksApiServices>
 using BooksApi.Services;
-// </snippet_UsingBooksApiServices>
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,21 +25,19 @@ namespace BooksApi
 
         public IConfiguration Configuration { get; }
 
-        // <snippet_ConfigureServices>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<BookstoreDatabaseSettings>(
-                Configuration.GetSection(nameof(BookstoreDatabaseSettings)));
+            services.Configure<DatabaseSettings>(
+                Configuration.GetSection(nameof(DatabaseSettings)));
 
-            services.AddSingleton<IBookstoreDatabaseSettings>(sp =>
-                sp.GetRequiredService<IOptions<BookstoreDatabaseSettings>>().Value);
+            services.AddSingleton<IDatabaseSettings>(sp =>
+                sp.GetRequiredService<IOptions<DatabaseSettings>>().Value);
 
             services.AddSingleton<BookService>();
 
             services.AddControllers()
                 .AddNewtonsoftJson(options => options.UseMemberCasing());
         }
-        // </snippet_ConfigureServices>
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {

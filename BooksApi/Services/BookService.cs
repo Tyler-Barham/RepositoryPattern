@@ -1,4 +1,5 @@
 ﻿using BooksApi.Models;
+using BooksApi.Repository;
 using MongoDB.Driver;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,42 +8,30 @@ namespace BooksApi.Services
 {
     public class BookService
     {
-        private readonly IMongoCollection<Book> _books;
+        private readonly MongoRepository<Book> _repo;
 
-        public BookService(IBookstoreDatabaseSettings settings)
+        public BookService(IDatabaseSettings settings)
         {
-            var client = new MongoClient(settings.MongoConnectionString);
-            var database = client.GetDatabase(settings.DatabaseName);
-
-            var collectionNames = database.ListCollectionNames().ToList();
-            if (!collectionNames.Contains(settings.BooksCollectionName))
-                database.CreateCollection(settings.BooksCollectionName);
-
-            _books = database.GetCollection<Book>(settings.BooksCollectionName);
-
-            Seed();
+            _repo = new MongoRepository<Book>(settings);
         }
 
         public List<Book> Get() =>
-            _books.Find(book => true).ToList();
+            _repo.Get(book => true);
 
         public Book Get(string id) =>
-            _books.Find<Book>(book => book.Id == id).FirstOrDefault();
+            _repo.GetById(id);
 
-        public Book Create(Book book)
-        {
-            _books.InsertOne(book);
-            return book;
-        }
+        public Book Create(Book book) =>
+            _repo.Add(book);
 
-        public void Update(string id, Book bookIn) =>
-            _books.ReplaceOne(book => book.Id == id, bookIn);
+        public Book Update(string id, Book bookIn) =>
+            _repo.Update(id, bookIn);
 
-        public void Remove(Book bookIn) =>
-            _books.DeleteOne(book => book.Id == bookIn.Id);
+        public bool Remove(Book bookIn) =>
+            _repo.Delete(bookIn);
 
-        public void Remove(string id) => 
-            _books.DeleteOne(book => book.Id == id);
+        public bool Remove(string id) =>
+            _repo.Delete(id);
 
         private void Seed()
         {
