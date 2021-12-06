@@ -87,8 +87,14 @@ namespace BooksApi.Repository
         /// <returns>The added entity including its new ObjectId.</returns>
         public virtual T Add(T entity)
         {
-            this.collection.InsertOne(entity);
-
+            try
+            {
+                this.collection.InsertOne(entity);
+            }
+            catch (MongoWriteException)
+            {
+                return default(T);
+            }
             return entity;
         }
 
@@ -120,7 +126,7 @@ namespace BooksApi.Repository
         /// <returns>The updated entity.</returns>
         public virtual T Update(TKey id, T entity)
         {
-            this.collection.UpdateOne(doc => doc.Id.Equals(id), entity.ToBsonDocument());
+            this.collection.ReplaceOne(doc => doc.Id.Equals(id), entity);
 
             return entity;
         }
@@ -143,28 +149,7 @@ namespace BooksApi.Repository
         /// <param name="id">The entity's id.</param>
         public virtual bool Delete(TKey id)
         {
-            if (typeof(T).IsSubclassOf(typeof(Entity)))
-            {
-                return this.Delete(new ObjectId(id as string));
-            }
-            else
-            {
-                var result = this.collection.DeleteOne(doc => doc.Id.Equals(id));
-
-                if (result.IsAcknowledged && result.DeletedCount > 0)
-                    return true;
-                else
-                    return false;
-            }
-        }
-
-        /// <summary>
-        /// Deletes an entity from the repository by its ObjectId.
-        /// </summary>
-        /// <param name="id">The ObjectId of the entity.</param>
-        public virtual bool Delete(ObjectId id)
-        {
-            var result = this.collection.DeleteOne(doc => new ObjectId(doc.Id as string).Equals(id));
+            var result = this.collection.DeleteOne(doc => doc.Id.Equals(id));
 
             if (result.IsAcknowledged && result.DeletedCount > 0)
                 return true;

@@ -8,11 +8,13 @@ namespace BooksApi.Services
 {
     public class BookService
     {
-        private readonly MongoRepository<Book> _repo;
+        private readonly IRepository<Book> _repo;
 
-        public BookService(IDatabaseSettings settings)
+        public BookService(IRepository<Book> repo)
         {
-            _repo = new MongoRepository<Book>(settings);
+            _repo = repo;
+
+            _Seed();
         }
 
         public List<Book> Get() =>
@@ -33,10 +35,10 @@ namespace BooksApi.Services
         public bool Remove(string id) =>
             _repo.Delete(id);
 
-        private void Seed()
+        private void _Seed()
         {
             // No books
-            if (!Get().Any())
+            if (_repo.Count() == 0)
             {
                 var books = new List<Book>()
                 {
@@ -57,7 +59,7 @@ namespace BooksApi.Services
                 };
 
                 foreach (var book in books)
-                    Create(book);
+                    _repo.Add(book);
             }
         }
     }

@@ -45,12 +45,15 @@ namespace BooksApi.Controllers
         [HttpPut("{id:length(24)}")]
         public IActionResult Update(string id, Book bookIn)
         {
+            if (id != bookIn.Id)
+                return BadRequest();
+
             var book = _bookService.Update(id, bookIn);
 
             if (book == null)
                 return NotFound();
             else
-                return NoContent();
+                return Ok();
         }
 
         [HttpDelete("{id:length(24)}")]
@@ -61,7 +64,7 @@ namespace BooksApi.Controllers
             if (!deleted)
                 return NotFound();
             else
-                return NoContent();
+                return Ok();
         }
     }
 }

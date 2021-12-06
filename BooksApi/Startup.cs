@@ -1,5 +1,6 @@
 using BooksApi.Models;
 using BooksApi.Services;
+using BooksApi.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,11 +28,11 @@ namespace BooksApi
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<DatabaseSettings>(
-                Configuration.GetSection(nameof(DatabaseSettings)));
-
-            services.AddSingleton<IDatabaseSettings>(sp =>
-                sp.GetRequiredService<IOptions<DatabaseSettings>>().Value);
+            // Any service with IRepository<Book> in its constructor will get this repo instace
+            services.AddSingleton<IRepository<Book>>(sp =>
+                new MongoRepository<Book>(
+                    Configuration.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>()
+                ));
 
             services.AddSingleton<BookService>();
 
