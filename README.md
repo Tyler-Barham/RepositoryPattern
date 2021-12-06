@@ -8,11 +8,12 @@ ___WIP__: This project needs a summary._
 This is a `.net5.0` project. It depends on
 * NewtonsoftJson v5.x.x
 * MongoDB.Driver v2.x.x
+* NSwag v13.x.x
 
 To get it up and running via the command line:
 ```sh
-> dotnet run
-# Navigate to localhost:5001/api
+> dotnet run --project .\BooksApi\BooksApi.csproj
+# Navigate to localhost:5000/swagger
 ```
 
 ## Databases
