@@ -28,11 +28,12 @@ namespace BooksApi
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // Read appsettings to objects
+            var mongoSettings = Configuration.GetSection(nameof(MongoDBSettings)).Get<MongoDBSettings>();
+            var cassandraSettings = Configuration.GetSection(nameof(CassandraDBSettings)).Get<CassandraDBSettings>();
+
             // Any service with IRepository<Book> in its constructor will get this repo instace
-            services.AddSingleton<IRepository<Book>>(sp =>
-                new MongoRepository<Book>(
-                    Configuration.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>()
-                ));
+            services.AddSingleton<IRepository<Book>>(sp => new MongoRepository<Book>(mongoSettings));
 
             services.AddSingleton<BookService>();
 

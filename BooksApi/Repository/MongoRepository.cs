@@ -23,10 +23,10 @@ namespace BooksApi.Repository
         protected internal IMongoCollection<T> collection;
         protected internal IClientSession session;
 
-        public MongoRepository(IDatabaseSettings settings)
+        public MongoRepository(MongoDBSettings settings)
         {
             // Connect to db
-            var client = new MongoClient(settings.MongoConnectionString);
+            var client = new MongoClient(settings.getMongoClientSettings());
             var database = client.GetDatabase(settings.DatabaseName);
 
             // Create collection if not exists
@@ -289,7 +289,7 @@ namespace BooksApi.Repository
     public class MongoRepository<T> : MongoRepository<T, string>, IRepository<T>
         where T : IEntity<string>
     {
-        public MongoRepository(IDatabaseSettings settings)
+        public MongoRepository(MongoDBSettings settings)
             : base(settings) { }
     }
 }
