@@ -1,6 +1,7 @@
 ﻿using BooksApi.Models;
 using BooksApi.Services;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 
 namespace BooksApi.Controllers
@@ -42,10 +43,10 @@ namespace BooksApi.Controllers
                 return CreatedAtRoute("GetBook", new { id = book.Id.ToString() }, book);
         }
 
-        [HttpPut("{id:length(24)}")]
+        [HttpPut("{id:length(36)}")]
         public IActionResult Update(string id, Book bookIn)
         {
-            if (id != bookIn.Id)
+            if (!id.Equals(bookIn.Id.ToString()))
                 return BadRequest();
 
             var book = _bookService.Update(id, bookIn);

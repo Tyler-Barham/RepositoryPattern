@@ -1,6 +1,7 @@
 ﻿using BooksApi.Models;
 using BooksApi.Repository;
 using MongoDB.Driver;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,19 +22,19 @@ namespace BooksApi.Services
             _repo.Get(book => true);
 
         public Book Get(string id) =>
-            _repo.GetById(id);
+            _repo.GetById(new Guid(id));
 
         public Book Create(Book book) =>
             _repo.Add(book);
 
         public Book Update(string id, Book bookIn) =>
-            _repo.Update(id, bookIn);
+            _repo.Update(new Guid(id), bookIn);
 
         public bool Remove(Book bookIn) =>
             _repo.Delete(bookIn);
 
         public bool Remove(string id) =>
-            _repo.Delete(id);
+            _repo.Delete(new Guid(id));
 
         private void _Seed()
         {

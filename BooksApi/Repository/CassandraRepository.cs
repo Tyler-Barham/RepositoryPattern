@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Cassandra;
+using Cassandra.Data.Linq;
 using BooksApi.Models;
 
 namespace BooksApi.Repository
 {
     /// <summary>
-    /// Deals with entities in MongoDb.
+    /// Deals with entities in Cassandrab.
     /// </summary>
     /// <typeparam name="T">The type contained in the repository.</typeparam>
     /// <typeparam name="TKey">The type used for the entity's Id.</typeparam>
@@ -23,6 +25,17 @@ namespace BooksApi.Repository
         public CassandraRepository(CassandraDBSettings settings)
         {
             // Connect to db
+            var session =
+                Cluster.Builder()
+                        .WithCloudSecureConnectionBundle(@".\secure-connect-bookstoredb.zip")
+                        .WithCredentials(settings.User, settings.Password)
+                        .Build()
+                        .Connect();
+            
+            
+            var rowSet = session.Execute($"select * from {settings.DatabaseName}");
+            Console.WriteLine(rowSet.First().GetValue<string>("key"));
+            
 
             // Create table if not exists
 
@@ -220,12 +233,12 @@ namespace BooksApi.Repository
     }
 
     /// <summary>
-    /// Deals with entities in MongoDb.
+    /// Deals with entities in Cassandra.
     /// </summary>
     /// <typeparam name="T">The type contained in the repository.</typeparam>
     /// <remarks>Entities are assumed to use strings for Id's.</remarks>
-    public class CassandraRepository<T> : CassandraRepository<T, string>, IRepository<T>
-        where T : IEntity<string>
+    public class CassandraRepository<T> : CassandraRepository<T, Guid>, IRepository<T>
+        where T : IEntity<Guid>
     {
         public CassandraRepository(CassandraDBSettings settings)
             : base(settings) { }

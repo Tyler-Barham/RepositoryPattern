@@ -1,5 +1,4 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using System;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
 
@@ -7,9 +6,8 @@ namespace BooksApi.Models
 {
     public class Book : Entity
     {
-        public override string Id { get; set; }
+        public override Guid Id { get; set; }
 
-        [BsonElement("Name")]
         [JsonProperty("Name")]
         public string BookName { get; set; }
 

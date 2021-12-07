@@ -195,8 +195,8 @@ namespace BooksApi.Repository
     /// </summary>
     /// <typeparam name="T">The type contained in the repository.</typeparam>
     /// <remarks>Entities are assumed to use strings for Id's.</remarks>
-    public class MongoRepository<T> : MongoRepository<T, string>, IRepository<T>
-        where T : IEntity<string>
+    public class MongoRepository<T> : MongoRepository<T, Guid>, IRepository<T>
+        where T : IEntity<Guid>
     {
         public MongoRepository(MongoDBSettings settings)
             : base(settings) { }
