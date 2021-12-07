@@ -63,29 +63,34 @@ namespace BooksApi.Repository
 
         public virtual void Add(IEnumerable<T> entities)
         {
-            this.collection.InsertMany(entities);
+            foreach (T entity in entities)
+                this.Add(entity);
         }
 
         public virtual T Update(T entity)
         {
-            this.collection.UpdateOne(doc => doc.Id.Equals(entity.Id), entity.ToBsonDocument());
+            var result = this.collection.ReplaceOne(doc => doc.Id.Equals(entity.Id), entity);
 
-            return entity;
+            if (result.IsAcknowledged && result.ModifiedCount > 0)
+                return entity;
+            else
+                return default(T);
         }
 
         public virtual T Update(TKey id, T entity)
         {
-            this.collection.ReplaceOne(doc => doc.Id.Equals(id), entity);
+            var result = this.collection.ReplaceOne(doc => doc.Id.Equals(id), entity);
 
-            return entity;
+            if (result.IsAcknowledged && result.ModifiedCount > 0)
+                return entity;
+            else
+                return default(T);
         }
 
         public virtual void Update(IEnumerable<T> entities)
         {
             foreach (T entity in entities)
-            {
                 this.Update(entity);
-            }
         }
 
         public virtual bool Delete(TKey id)
