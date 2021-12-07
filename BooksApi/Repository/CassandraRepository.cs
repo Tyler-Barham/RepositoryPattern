@@ -16,26 +16,20 @@ namespace BooksApi.Repository
     public class CassandraRepository<T, TKey> : IRepository<T, TKey>
         where T : IEntity<TKey>
     {
-        /// <summary>
-        /// MongoCollection field.
-        /// </summary>
-        //protected internal IMongoCollection<T> collection;
-        //protected internal IClientSession session;
+
+        protected internal ISession session;
 
         public CassandraRepository(CassandraDBSettings settings)
         {
             // Connect to db
-            var session =
-                Cluster.Builder()
+            session = Cluster.Builder()
                         .WithCloudSecureConnectionBundle(@".\secure-connect-bookstoredb.zip")
                         .WithCredentials(settings.User, settings.Password)
                         .Build()
                         .Connect();
             
-            
             var rowSet = session.Execute($"select * from {settings.DatabaseName}");
             Console.WriteLine(rowSet.First().GetValue<string>("key"));
-            
 
             // Create table if not exists
 
