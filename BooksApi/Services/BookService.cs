@@ -59,8 +59,7 @@ namespace BooksApi.Services
                     },
                 };
 
-                foreach (var book in books)
-                    _repo.Add(book);
+                _repo.Add(books);
             }
         }
     }

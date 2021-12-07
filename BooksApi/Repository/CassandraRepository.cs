@@ -72,7 +72,8 @@ namespace BooksApi.Repository
         /// <param name="entities">The entities of type T.</param>
         public virtual void Add(IEnumerable<T> entities)
         {
-            throw new NotImplementedException();
+            foreach (T entity in entities)
+                this.Add(entity);
         }
 
         /// <summary>
@@ -92,6 +93,9 @@ namespace BooksApi.Repository
         /// <returns>The updated entity.</returns>
         public virtual T Update(TKey id, T entity)
         {
+            if (!id.Equals(entity.Id))
+                return default(T);
+
             throw new NotImplementedException();
         }
 
@@ -101,7 +105,8 @@ namespace BooksApi.Repository
         /// <param name="entities">The entities to update.</param>
         public virtual void Update(IEnumerable<T> entities)
         {
-            throw new NotImplementedException();
+            foreach (T entity in entities)
+                this.Update(entity);
         }
 
         /// <summary>

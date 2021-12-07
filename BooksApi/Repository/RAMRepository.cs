@@ -2,63 +2,51 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using MongoDB.Bson;
-using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 using BooksApi.Models;
 
 namespace BooksApi.Repository
 {
     /// <summary>
-    /// Deals with entities in MongoDb.
+    /// Deals with entities in memory.
     /// </summary>
     /// <typeparam name="T">The type contained in the repository.</typeparam>
     /// <typeparam name="TKey">The type used for the entity's Id.</typeparam>
-    public class MongoRepository<T, TKey> : IRepository<T, TKey>
+    public class RAMRepository<T, TKey> : IRepository<T, TKey>
         where T : IEntity<TKey>
     {
         /// <summary>
-        /// MongoCollection field.
+        /// A collection to store all entities.
         /// </summary>
-        protected internal IMongoCollection<T> collection;
-        protected internal IClientSession session;
+        protected internal EntityList<T, TKey> collection;
+        private EntityList<T, TKey> _transactionCollection;
 
-        public MongoRepository(MongoDBSettings settings)
+        public RAMRepository(MongoDBSettings settings)
         {
-            // Connect to db
-            var client = new MongoClient(settings.getMongoClientSettings());
-            var database = client.GetDatabase(settings.DatabaseName);
-
-            // Create collection if not exists
-            var collectionNames = database.ListCollectionNames().ToList();
-            if (!collectionNames.Contains(settings.CollectionName))
-                database.CreateCollection(settings.CollectionName);
-
-            // Get the collection
-            this.collection = database.GetCollection<T>(settings.CollectionName);
+            // Setup list
+            collection = new EntityList<T, TKey>();
         }
 
         public virtual List<T> Get(Expression<Func<T, bool>> filter)
         {
-            return this.collection.Find(filter).ToList();
+            return this.collection.AsQueryable<T>().Where(filter).ToList();
         }
 
         public virtual T GetById(TKey id)
         {
-            return this.collection.Find(doc => doc.Id.Equals(id)).FirstOrDefault();
+            return this.collection.FirstOrDefault(doc => doc.Id.Equals(id));
         }
 
         public virtual T Add(T entity)
         {
-            try
+            if (this.GetById(entity.Id) == null)
             {
-                this.collection.InsertOne(entity);
+                this.collection.Add(entity);
+                return entity;
             }
-            catch (MongoWriteException)
+            else
             {
                 return default(T);
             }
-            return entity;
         }
 
         public virtual void Add(IEnumerable<T> entities)
@@ -69,22 +57,14 @@ namespace BooksApi.Repository
 
         public virtual T Update(T entity)
         {
-            var result = this.collection.ReplaceOne(doc => doc.Id.Equals(entity.Id), entity);
-
-            if (result.IsAcknowledged && result.ModifiedCount > 0)
-                return entity;
-            else
-                return default(T);
+            return this.Update(entity.Id, entity);
         }
 
         public virtual T Update(TKey id, T entity)
         {
-            if (!id.Equals(entity.Id))
-                return default(T);
+            var isUpdated = this.collection.UpdateEntity(id, entity);
 
-            var result = this.collection.ReplaceOne(doc => doc.Id.Equals(id), entity);
-
-            if (result.IsAcknowledged && result.ModifiedCount > 0)
+            if (isUpdated)
                 return entity;
             else
                 return default(T);
@@ -98,12 +78,7 @@ namespace BooksApi.Repository
 
         public virtual bool Delete(TKey id)
         {
-            var result = this.collection.DeleteOne(doc => doc.Id.Equals(id));
-
-            if (result.IsAcknowledged && result.DeletedCount > 0)
-                return true;
-            else
-                return false;
+            return this.collection.RemoveEntity(id);
         }
 
         public virtual bool Delete(T entity)
@@ -113,27 +88,26 @@ namespace BooksApi.Repository
 
         public virtual bool Delete(Expression<Func<T, bool>> predicate)
         {
-            var result = this.collection.DeleteMany(predicate);
+            var entsToDel = this.Get(predicate);
+            bool anyDeleted = false;
+            foreach (var entity in entsToDel)
+            {
+                anyDeleted &= this.Delete(entity);
+            }
 
-            if (result.IsAcknowledged && result.DeletedCount > 0)
-                return true;
-            else
-                return false;
+            return anyDeleted;
         }
 
         public virtual bool DeleteAll()
         {
-            var result = this.collection.DeleteMany(doc => true);
+            this.collection.Clear();
 
-            if (result.IsAcknowledged && result.DeletedCount > 0)
-                return true;
-            else
-                return false;
+            return (this.collection.Count == 0);
         }
 
         public virtual long Count()
         {
-            return this.collection.CountDocuments(doc => true);
+            return this.collection.Count;
         }
 
         public virtual bool Exists(Expression<Func<T, bool>> predicate)
@@ -143,14 +117,12 @@ namespace BooksApi.Repository
 
         public virtual IDisposable RequestStart()
         {
-            this.session = this.collection.Database.Client.StartSession();
-            this.session.StartTransaction();
-            return this.session;
+            throw new NotImplementedException();
         }
 
         public virtual void RequestDone()
         {
-            this.session.CommitTransaction();
+            throw new NotImplementedException();
         }
 
         #region IQueryable<T>
@@ -203,10 +175,10 @@ namespace BooksApi.Repository
     /// </summary>
     /// <typeparam name="T">The type contained in the repository.</typeparam>
     /// <remarks>Entities are assumed to use strings for Id's.</remarks>
-    public class MongoRepository<T> : MongoRepository<T, Guid>, IRepository<T>
+    public class RAMRepository<T> : RAMRepository<T, Guid>, IRepository<T>
         where T : IEntity<Guid>
     {
-        public MongoRepository(MongoDBSettings settings)
+        public RAMRepository(MongoDBSettings settings)
             : base(settings) { }
     }
 }
