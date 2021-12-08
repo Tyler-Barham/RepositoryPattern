@@ -16,7 +16,7 @@ namespace BooksApi.UnitTests
             // Ensure we have an empty repo once the service has be inited
             repo.DeleteAll();
 
-            for(int i = 0; i < numEntities; i++)
+            for (int i = 0; i < numEntities; i++)
                 repo.Add(GetGenericBook(i.ToString()));
 
             // Make sure our setup succeeded
@@ -33,7 +33,7 @@ namespace BooksApi.UnitTests
                 Author = $"Author {suffix}",
                 BookName = $"Book {suffix}",
                 Category = $"Category {random.Next(0, 2)}",
-                Price = (decimal)random.NextDouble()*100 // Random value between 0-100
+                Price = (decimal)random.NextDouble() * 100 // Random value between 0-100
             };
         }
         public class GetMethod
@@ -42,7 +42,7 @@ namespace BooksApi.UnitTests
             [InlineData(0)]
             [InlineData(1)]
             [InlineData(2)]
-            public void ReturnAll(int numEntities)
+            public void ReturnAllEntities(int numEntities)
             {
                 // Arrange
                 var service = SetupRepo(numEntities);
@@ -55,7 +55,7 @@ namespace BooksApi.UnitTests
             }
 
             [Fact]
-            public void ReturnSpecific()
+            public void ReturnSpecificEntity()
             {
                 // Arrange
                 var service = SetupRepo(0);
@@ -72,7 +72,7 @@ namespace BooksApi.UnitTests
             [Theory]
             [InlineData(0)]
             [InlineData(1)]
-            public void ReturnNull(int numEntities)
+            public void ReturnNullForEmptyGuid(int numEntities)
             {
                 // Arrange
                 var service = SetupRepo(numEntities);
