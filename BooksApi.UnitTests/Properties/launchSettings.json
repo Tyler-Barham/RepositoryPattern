@@ -1,0 +1,19 @@
+{
+  "profiles": {
+    "BooksApi.UnitTests": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "test",
+      "workingDirectory": "./"
+    },
+    "BooksApi.UnitTestsCoverage": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "test --collect:\"XPlat Code Coverage\"",
+      "workingDirectory": "./"
+    },
+    "WSL 2": {
+      "commandName": "WSL2"
+    }
+  }
+}
