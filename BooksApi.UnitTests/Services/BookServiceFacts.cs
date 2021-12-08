@@ -36,6 +36,7 @@ namespace BooksApi.UnitTests
                 Price = (decimal)random.NextDouble() * 100 // Random value between 0-100
             };
         }
+
         public class GetMethod
         {
             [Theory]
@@ -185,28 +186,60 @@ namespace BooksApi.UnitTests
 
         public class RemoveMethod
         {
-            [Fact(Skip = "NotImplemented")]
+            [Fact]
             public void RemoveExistingEntityById()
             {
-                throw new NotImplementedException();
+                // Arrange
+                var service = SetupRepo(0);
+                var existingBook = service.Create(GetGenericBook("A"));
+
+                // Act
+                var success = service.Remove(existingBook.Id.ToString());
+
+                // Assert
+                Assert.True(success);
             }
 
-            [Fact(Skip = "NotImplemented")]
+            [Fact]
             public void RemoveNonExistingEntityByIdFails()
             {
-                throw new NotImplementedException();
+                // Arrange
+                var service = SetupRepo(0);
+                var nonexistingBook = GetGenericBook("A");
+
+                // Act
+                var success = service.Remove(nonexistingBook.Id.ToString());
+
+                // Assert
+                Assert.False(success);
             }
 
-            [Fact(Skip = "NotImplemented")]
+            [Fact]
             public void RemoveExistingEntityByEntity()
             {
-                throw new NotImplementedException();
+                // Arrange
+                var service = SetupRepo(0);
+                var existingBook = service.Create(GetGenericBook("A"));
+
+                // Act
+                var success = service.Remove(existingBook);
+
+                // Assert
+                Assert.True(success);
             }
 
-            [Fact(Skip = "NotImplemented")]
+            [Fact]
             public void RemoveNonExistingEntityByEntityFails()
             {
-                throw new NotImplementedException();
+                // Arrange
+                var service = SetupRepo(0);
+                var nonexistingBook = GetGenericBook("A");
+
+                // Act
+                var success = service.Remove(nonexistingBook);
+
+                // Assert
+                Assert.False(success);
             }
         }
     }
