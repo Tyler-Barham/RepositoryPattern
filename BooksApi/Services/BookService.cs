@@ -15,7 +15,7 @@ namespace BooksApi.Services
         {
             _repo = repo;
 
-            _Seed();
+            Seed();
         }
 
         public List<Book> Get() =>
@@ -36,7 +36,7 @@ namespace BooksApi.Services
         public bool Remove(string id) =>
             _repo.Delete(new Guid(id));
 
-        private void _Seed()
+        private void Seed()
         {
             // No books
             if (_repo.Count() == 0)
@@ -45,6 +45,7 @@ namespace BooksApi.Services
                 {
                     new Book
                     {
+                        Id = Guid.NewGuid(),
                         BookName = "Design Patterns",
                         Price = 54.93M,
                         Category = "Computers",
@@ -52,6 +53,7 @@ namespace BooksApi.Services
                     },
                     new Book
                     {
+                        Id = Guid.NewGuid(),
                         BookName = "Clean Code",
                         Price = 43.15M,
                         Category = "Computers",

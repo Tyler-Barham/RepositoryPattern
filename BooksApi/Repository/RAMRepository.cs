@@ -18,9 +18,8 @@ namespace BooksApi.Repository
         /// A collection to store all entities.
         /// </summary>
         protected internal EntityList<T, TKey> collection;
-        private EntityList<T, TKey> _transactionCollection;
 
-        public RAMRepository(MongoDBSettings settings)
+        public RAMRepository()
         {
             // Setup list
             collection = new EntityList<T, TKey>();
@@ -45,7 +44,7 @@ namespace BooksApi.Repository
             }
             else
             {
-                return default(T);
+                return default;
             }
         }
 
@@ -67,7 +66,7 @@ namespace BooksApi.Repository
             if (isUpdated)
                 return entity;
             else
-                return default(T);
+                return default;
         }
 
         public virtual void Update(IEnumerable<T> entities)
@@ -171,15 +170,15 @@ namespace BooksApi.Repository
     }
 
     /// <summary>
-    /// Deals with entities in MongoDb.
+    /// Deals with entities in memory.
     /// </summary>
     /// <typeparam name="T">The type contained in the repository.</typeparam>
     /// <remarks>Entities are assumed to use strings for Id's.</remarks>
     public class RAMRepository<T> : RAMRepository<T, Guid>, IRepository<T>
         where T : IEntity<Guid>
     {
-        public RAMRepository(MongoDBSettings settings)
-            : base(settings) { }
+        public RAMRepository()
+            : base() { }
     }
 }
 

@@ -26,7 +26,7 @@ namespace BooksApi.Repository
         public MongoRepository(MongoDBSettings settings)
         {
             // Connect to db
-            var client = new MongoClient(settings.getMongoClientSettings());
+            var client = new MongoClient(settings.GetMongoClientSettings());
             var database = client.GetDatabase(settings.DatabaseName);
 
             // Create collection if not exists
@@ -56,7 +56,7 @@ namespace BooksApi.Repository
             }
             catch (MongoWriteException)
             {
-                return default(T);
+                return default;
             }
             return entity;
         }
@@ -74,20 +74,20 @@ namespace BooksApi.Repository
             if (result.IsAcknowledged && result.ModifiedCount > 0)
                 return entity;
             else
-                return default(T);
+                return default;
         }
 
         public virtual T Update(TKey id, T entity)
         {
             if (!id.Equals(entity.Id))
-                return default(T);
+                return default;
 
             var result = this.collection.ReplaceOne(doc => doc.Id.Equals(id), entity);
 
             if (result.IsAcknowledged && result.ModifiedCount > 0)
                 return entity;
             else
-                return default(T);
+                return default;
         }
 
         public virtual void Update(IEnumerable<T> entities)

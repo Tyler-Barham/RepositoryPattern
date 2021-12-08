@@ -94,7 +94,7 @@ namespace BooksApi.Repository
         public virtual T Update(TKey id, T entity)
         {
             if (!id.Equals(entity.Id))
-                return default(T);
+                return default;
 
             throw new NotImplementedException();
         }

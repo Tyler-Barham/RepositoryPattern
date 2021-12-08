@@ -6,13 +6,13 @@ namespace BooksApi.Repository
     {
         public string CollectionName { get; set; }
         
-        public MongoClientSettings getMongoClientSettings() =>
+        public MongoClientSettings GetMongoClientSettings() =>
             MongoClientSettings.FromConnectionString($"mongodb+srv://{User}:{Password}@{Cluster}{Domain}/{DatabaseName}{ConnectionParameters}");
     }
 
     public class CassandraDBSettings : DatabaseSettings
     {
-        public void getCassandraClientSettings() { }
+        public void GetCassandraClientSettings() { }
     }
 
     public class DatabaseSettings : IDatabaseSettings
