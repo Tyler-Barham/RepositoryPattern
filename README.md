@@ -10,14 +10,27 @@ This is a `.net5.0` project. It depends on
 * MongoDB.Driver v2.x.x
 * CassandraCSharpDriver v3.x.x
 * NSwag v13.x.x
+* xUnit v2.X.x
 
 To get it up and running via the command line:
 ```sh
-> dotnet run --project .\BooksApi\BooksApi.csproj
+> dotnet run --project ./BooksApi/BooksApi.csproj
 # Navigate to localhost:5000/swagger
 ```
 
+To run tests via the command line:
+```sh
+> dotnet test
+
+# Example output
+Passed!  - Failed:     0, Passed:     6, Skipped:     1, Total:     7, Duration: 25 ms - BooksApi.UnitTests.dll (net5.0)
+```
+
 ## Databases
+All databases use the Repository pattern and implement the [IRepository](BooksApi/Repository/IRepository.cs) interface.
+
+### In-memory
+There is an in-memory database, [RAMRepository](BooksApi/Repository/RAMRepository.cs), which is used for testing.
 
 ### MongoDB
 There is a free cloud MongoDB instance hosted via Mongo Atlas in AWS' Sydney datacenter. The connection details are within [appsettings.json](BooksApi/appsettings.json) and built into a connection string within [MongoRepository.cs](BooksApi/Repository/MongoRepository.cs).
