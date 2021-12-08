@@ -118,22 +118,68 @@ namespace BooksApi.UnitTests
 
         public class UpdateMethod
         {
-            [Fact(Skip = "NotImplemented")]
+            [Fact]
             public void UpdateExistingEntity()
             {
-                throw new NotImplementedException();
+                // Arrange
+                var service = SetupRepo(0);
+                var initialBook = service.Create(GetGenericBook("A"));
+                var expectedId = initialBook.Id;
+                var updatedBook = GetGenericBook("B");
+                updatedBook.Id = expectedId;
+
+                // Act
+                var result = service.Update(expectedId.ToString(), updatedBook);
+
+                // Assert
+                Assert.Equal(updatedBook, result);
             }
 
-            [Fact(Skip = "NotImplemented")]
-            public void UpdateNonExistingEntity()
+            [Fact]
+            public void UpdateNonExistingEntityFails()
             {
-                throw new NotImplementedException();
+                // Arrange
+                var service = SetupRepo(0);
+                var newBook = GetGenericBook("A");
+
+                // Act
+                var result = service.Update(newBook.Id.ToString(), newBook);
+
+                // Assert
+                Assert.Null(result);
             }
 
-            [Fact(Skip = "NotImplemented")]
-            public void UpdateExistingEntityWithIncorrectId()
+            [Fact]
+            public void UpdateExistingEntityWithIncorrectIdParam()
             {
-                throw new NotImplementedException();
+                // Arrange
+                var service = SetupRepo(0);
+                var initialBook = service.Create(GetGenericBook("A"));
+                var expectedId = initialBook.Id;
+                var updatedBook = GetGenericBook("B");
+                updatedBook.Id = expectedId;
+
+                // Act
+                var result = service.Update(Guid.Empty.ToString(), updatedBook);
+
+                // Assert
+                Assert.Null(result);
+            }
+
+            [Fact]
+            public void UpdateExistingEntityWithIncorrectEntityId()
+            {
+                // Arrange
+                var service = SetupRepo(0);
+                var initialBook = service.Create(GetGenericBook("A"));
+                var expectedId = initialBook.Id;
+                initialBook.Id = Guid.NewGuid();
+
+                // Act
+                var result = service.Update(expectedId.ToString(), initialBook);
+
+                // Assert
+                Assert.Null(result);
             }
         }
 
@@ -146,7 +192,7 @@ namespace BooksApi.UnitTests
             }
 
             [Fact(Skip = "NotImplemented")]
-            public void RemoveNonExistingEntityById()
+            public void RemoveNonExistingEntityByIdFails()
             {
                 throw new NotImplementedException();
             }
@@ -158,7 +204,7 @@ namespace BooksApi.UnitTests
             }
 
             [Fact(Skip = "NotImplemented")]
-            public void RemoveNonExistingEntityByEntity()
+            public void RemoveNonExistingEntityByEntityFails()
             {
                 throw new NotImplementedException();
             }
