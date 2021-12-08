@@ -87,12 +87,79 @@ namespace BooksApi.UnitTests
 
         public class CreateMethod
         {
-            [Fact (Skip = "Not Implemented")]
-            public void CreateNew()
+            [Fact]
+            public void CreateNewEntity()
             {
                 // Arrange
+                var service = SetupRepo(0);
+                var expectedBook = GetGenericBook("A");
+
                 // Act
+                var result = service.Create(expectedBook);
+
                 // Assert
+                Assert.Equal(expectedBook, result);
+            }
+
+            [Fact]
+            public void CreateDuplicateEntityFails()
+            {
+                // Arrange
+                var service = SetupRepo(0);
+                var existingBook = service.Create(GetGenericBook("A"));
+
+                // Act
+                var result = service.Create(existingBook);
+
+                // Assert
+                Assert.Null(result);
+            }
+        }
+
+        public class UpdateMethod
+        {
+            [Fact(Skip = "NotImplemented")]
+            public void UpdateExistingEntity()
+            {
+                throw new NotImplementedException();
+            }
+
+            [Fact(Skip = "NotImplemented")]
+            public void UpdateNonExistingEntity()
+            {
+                throw new NotImplementedException();
+            }
+
+            [Fact(Skip = "NotImplemented")]
+            public void UpdateExistingEntityWithIncorrectId()
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public class RemoveMethod
+        {
+            [Fact(Skip = "NotImplemented")]
+            public void RemoveExistingEntityById()
+            {
+                throw new NotImplementedException();
+            }
+
+            [Fact(Skip = "NotImplemented")]
+            public void RemoveNonExistingEntityById()
+            {
+                throw new NotImplementedException();
+            }
+
+            [Fact(Skip = "NotImplemented")]
+            public void RemoveExistingEntityByEntity()
+            {
+                throw new NotImplementedException();
+            }
+
+            [Fact(Skip = "NotImplemented")]
+            public void RemoveNonExistingEntityByEntity()
+            {
                 throw new NotImplementedException();
             }
         }
