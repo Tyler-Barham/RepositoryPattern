@@ -27,13 +27,21 @@ To get it up and running via the command line:
 ### Running the tests
 To run tests via the command line:
 ```sh
-> dotnet test --collect:"XPlat Code Coverage"
-
+> dotnet test
 # Example output
 Passed!  - Failed:     0, Passed:     6, Skipped:     1, Total:     7, Duration: 25 ms - BooksApi.UnitTests.dll (net5.0)
+```
 
-> reportgenerator -reports:"./BooksApi.UnitTests/TestResults/{guid}/coverage.cobertura.xml" -targetdir:"./BooksApi.UnitTests/TestResults/CoverageReport" -reporttypes:Html
-# Now open the index.html that was generated in the target directory
+To run the tests and generate code coverage:
+```sh
+> cd .\BooksApi.UnitTests\
+> .\GenCodeCoverage.ps1
+# Example output
+   Line coverage:  30.9% (115 of 371)
+   Branch coverage:  27% (20 of 74)
+   Method coverage:  26.6% (28 of 105)
+
+# Now open .\TestResults\CoverageReport\index.html to view a detailed breakdown of coverage
 ```
 
 ## Databases
