@@ -7,9 +7,9 @@ using BooksApi.Services;
 
 namespace BooksApi.UnitTests.Utilities
 {
-    class Initializers
+    public class Initializers
     {
-        public static BookService GetService(int numEntities = 1)
+        public static BookService GetBookService(int numEntities = 0)
         {
             var repo = new RAMRepository<Book>();
             var service = new BookService(repo);
@@ -38,5 +38,7 @@ namespace BooksApi.UnitTests.Utilities
             };
         }
 
+        public static BookController GetBookController(int numEntities = 0)
+            => new BookController(GetBookService(numEntities));
     }
 }
