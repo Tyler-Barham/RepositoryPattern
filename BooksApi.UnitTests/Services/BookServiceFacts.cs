@@ -12,7 +12,7 @@ namespace BooksApi.UnitTests.Services
             [InlineData(0)]
             [InlineData(1)]
             [InlineData(2)]
-            public void ReturnAllEntities(int numEntities)
+            public void GetAllEntities_ReturnsMatchingCount(int numEntities)
             {
                 // Arrange
                 var service = Initializers.GetBookService(numEntities);
@@ -25,7 +25,7 @@ namespace BooksApi.UnitTests.Services
             }
 
             [Fact]
-            public void ReturnSpecificEntity()
+            public void GetSpecificEntity_ReturnsMatchingEntity()
             {
                 // Arrange
                 var service = Initializers.GetBookService();
@@ -42,7 +42,7 @@ namespace BooksApi.UnitTests.Services
             [Theory]
             [InlineData(0)]
             [InlineData(1)]
-            public void ReturnNullForEmptyGuid(int numEntities)
+            public void GetWithEmptyGuid_ReturnsNull(int numEntities)
             {
                 // Arrange
                 var service = Initializers.GetBookService(numEntities);
@@ -58,7 +58,7 @@ namespace BooksApi.UnitTests.Services
         public class CreateMethod
         {
             [Fact]
-            public void CreateNewEntity()
+            public void CreateNewEntity_ReturnsCreatedEntity()
             {
                 // Arrange
                 var service = Initializers.GetBookService();
@@ -72,7 +72,7 @@ namespace BooksApi.UnitTests.Services
             }
 
             [Fact]
-            public void CreateDuplicateEntityFails()
+            public void CreateDuplicateEntity_ReturnsNull()
             {
                 // Arrange
                 var service = Initializers.GetBookService();
@@ -89,7 +89,7 @@ namespace BooksApi.UnitTests.Services
         public class UpdateMethod
         {
             [Fact]
-            public void UpdateExistingEntity()
+            public void UpdateExistingEntity_ReturnsUpdatedEntity()
             {
                 // Arrange
                 var service = Initializers.GetBookService();
@@ -106,7 +106,7 @@ namespace BooksApi.UnitTests.Services
             }
 
             [Fact]
-            public void UpdateNonExistingEntityFails()
+            public void UpdateNonExistingEntity_ReturnsNull()
             {
                 // Arrange
                 var service = Initializers.GetBookService();
@@ -120,7 +120,7 @@ namespace BooksApi.UnitTests.Services
             }
 
             [Fact]
-            public void UpdateExistingEntityWithIncorrectIdParam()
+            public void UpdateExistingEntityWithIncorrectIdParam_ReturnsNull()
             {
                 // Arrange
                 var service = Initializers.GetBookService();
@@ -137,7 +137,7 @@ namespace BooksApi.UnitTests.Services
             }
 
             [Fact]
-            public void UpdateExistingEntityWithIncorrectEntityId()
+            public void UpdateExistingEntityWithIncorrectEntityId_ReturnsNull()
             {
                 // Arrange
                 var service = Initializers.GetBookService();
@@ -156,7 +156,7 @@ namespace BooksApi.UnitTests.Services
         public class RemoveMethod
         {
             [Fact]
-            public void RemoveExistingEntityById()
+            public void RemoveExistingEntityById_ReturnsTrue()
             {
                 // Arrange
                 var service = Initializers.GetBookService();
@@ -171,7 +171,7 @@ namespace BooksApi.UnitTests.Services
             }
 
             [Fact]
-            public void RemoveNonExistingEntityByIdFails()
+            public void RemoveNonExistingEntityById_ReturnsFalse()
             {
                 // Arrange
                 var service = Initializers.GetBookService();
@@ -185,7 +185,7 @@ namespace BooksApi.UnitTests.Services
             }
 
             [Fact]
-            public void RemoveExistingEntityByEntity()
+            public void RemoveExistingEntityByEntity_ReturnsTrue()
             {
                 // Arrange
                 var service = Initializers.GetBookService();
@@ -200,7 +200,7 @@ namespace BooksApi.UnitTests.Services
             }
 
             [Fact]
-            public void RemoveNonExistingEntityByEntityFails()
+            public void RemoveNonExistingEntityByEntity_ReturnsFalse()
             {
                 // Arrange
                 var service = Initializers.GetBookService();

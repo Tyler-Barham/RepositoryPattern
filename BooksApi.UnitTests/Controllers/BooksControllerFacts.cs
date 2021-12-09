@@ -15,7 +15,7 @@ namespace BooksApi.UnitTests.Controllers
             [InlineData(0)]
             [InlineData(1)]
             [InlineData(2)]
-            public void GetAllEntities_Succeeds(int numEntities)
+            public void GetAllEntities_ReturnsMatchingCount(int numEntities)
             {
                 // Arrange
                 var controller = Initializers.GetBookController(numEntities);
@@ -28,7 +28,7 @@ namespace BooksApi.UnitTests.Controllers
             }
 
             [Fact]
-            public void GetSpecificEntity_Succeeds()
+            public void GetSpecificEntity_ReturnsMatchingEntity()
             {
                 // Arrange
                 var controller = Initializers.GetBookController();
@@ -62,7 +62,7 @@ namespace BooksApi.UnitTests.Controllers
         public class HttpPost
         {
             [Fact]
-            public void CreateNewEntity_Succeeds()
+            public void CreateNewEntity_ReturnsCreatedWithMatchingEntity()
             {
                 // Arrange
                 var controller = Initializers.GetBookController();
@@ -97,7 +97,7 @@ namespace BooksApi.UnitTests.Controllers
         public class HttpPut
         {
             [Fact]
-            public void UpdateExistingEntity_Succeeds()
+            public void UpdateExistingEntity_ReturnsOkThenMatchingEntity()
             {
                 // Arrange
                 var controller = Initializers.GetBookController();
@@ -169,7 +169,7 @@ namespace BooksApi.UnitTests.Controllers
         public class HttpDelete
         {
             [Fact]
-            public void RemoveExistingEntity_SucceedsThenNotFound()
+            public void RemoveExistingEntity_ReturnsOkThenNotFound()
             {
                 // Arrange
                 var controller = Initializers.GetBookController();
