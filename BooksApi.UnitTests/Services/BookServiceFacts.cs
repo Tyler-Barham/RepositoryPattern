@@ -4,6 +4,8 @@ using BooksApi.Models;
 using BooksApi.Services;
 using BooksApi.Repository;
 
+//[assembly: CollectionBehavior(DisableTestParallelization = true)]
+
 namespace BooksApi.UnitTests
 {
     public class BookServiceFacts
