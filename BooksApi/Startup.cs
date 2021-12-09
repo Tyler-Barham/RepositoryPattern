@@ -1,6 +1,6 @@
 using BooksApi.Models;
 using BooksApi.Services;
-using BooksApi.Repository;
+using BooksApi.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;

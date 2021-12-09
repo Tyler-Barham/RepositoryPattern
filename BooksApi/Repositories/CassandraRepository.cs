@@ -6,7 +6,7 @@ using Cassandra;
 using Cassandra.Data.Linq;
 using BooksApi.Models;
 
-namespace BooksApi.Repository
+namespace BooksApi.Repositories
 {
     /// <summary>
     /// Deals with entities in Cassandrab.

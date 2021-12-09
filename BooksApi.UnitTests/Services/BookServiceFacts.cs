@@ -2,7 +2,7 @@ using System;
 using Xunit;
 using BooksApi.Models;
 using BooksApi.Services;
-using BooksApi.Repository;
+using BooksApi.Repositories;
 
 //[assembly: CollectionBehavior(DisableTestParallelization = true)]
 

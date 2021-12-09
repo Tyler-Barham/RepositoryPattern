@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using BooksApi.Models;
 
-namespace BooksApi.Repository
+namespace BooksApi.Repositories
 {
     public class IRepository
     {

@@ -1,6 +1,6 @@
 ﻿using MongoDB.Driver;
 
-namespace BooksApi.Repository
+namespace BooksApi.Repositories
 {
     public class MongoDBSettings : DatabaseSettings
     {
