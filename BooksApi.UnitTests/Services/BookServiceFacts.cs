@@ -6,11 +6,11 @@ using BooksApi.Repositories;
 
 //[assembly: CollectionBehavior(DisableTestParallelization = true)]
 
-namespace BooksApi.UnitTests
+namespace BooksApi.UnitTests.Services
 {
     public class BookServiceFacts
     {
-        private static BookService SetupRepo(int numEntities = 1)
+        private static BookService GetService(int numEntities = 1)
         {
             var repo = new RAMRepository<Book>();
             var service = new BookService(repo);
@@ -48,7 +48,7 @@ namespace BooksApi.UnitTests
             public void ReturnAllEntities(int numEntities)
             {
                 // Arrange
-                var service = SetupRepo(numEntities);
+                var service = GetService(numEntities);
 
                 // Act
                 var results = service.Get();
@@ -61,7 +61,7 @@ namespace BooksApi.UnitTests
             public void ReturnSpecificEntity()
             {
                 // Arrange
-                var service = SetupRepo(0);
+                var service = GetService(0);
                 var expectedBook = GetGenericBook("A");
                 service.Create(expectedBook);
 
@@ -78,7 +78,7 @@ namespace BooksApi.UnitTests
             public void ReturnNullForEmptyGuid(int numEntities)
             {
                 // Arrange
-                var service = SetupRepo(numEntities);
+                var service = GetService(numEntities);
 
                 // Act
                 var result = service.Get(Guid.Empty.ToString());
@@ -94,7 +94,7 @@ namespace BooksApi.UnitTests
             public void CreateNewEntity()
             {
                 // Arrange
-                var service = SetupRepo(0);
+                var service = GetService(0);
                 var expectedBook = GetGenericBook("A");
 
                 // Act
@@ -108,7 +108,7 @@ namespace BooksApi.UnitTests
             public void CreateDuplicateEntityFails()
             {
                 // Arrange
-                var service = SetupRepo(0);
+                var service = GetService(0);
                 var existingBook = service.Create(GetGenericBook("A"));
 
                 // Act
@@ -125,7 +125,7 @@ namespace BooksApi.UnitTests
             public void UpdateExistingEntity()
             {
                 // Arrange
-                var service = SetupRepo(0);
+                var service = GetService(0);
                 var initialBook = service.Create(GetGenericBook("A"));
                 var expectedId = initialBook.Id;
                 var updatedBook = GetGenericBook("B");
@@ -142,7 +142,7 @@ namespace BooksApi.UnitTests
             public void UpdateNonExistingEntityFails()
             {
                 // Arrange
-                var service = SetupRepo(0);
+                var service = GetService(0);
                 var newBook = GetGenericBook("A");
 
                 // Act
@@ -156,7 +156,7 @@ namespace BooksApi.UnitTests
             public void UpdateExistingEntityWithIncorrectIdParam()
             {
                 // Arrange
-                var service = SetupRepo(0);
+                var service = GetService(0);
                 var initialBook = service.Create(GetGenericBook("A"));
                 var expectedId = initialBook.Id;
                 var updatedBook = GetGenericBook("B");
@@ -173,7 +173,7 @@ namespace BooksApi.UnitTests
             public void UpdateExistingEntityWithIncorrectEntityId()
             {
                 // Arrange
-                var service = SetupRepo(0);
+                var service = GetService(0);
                 var initialBook = service.Create(GetGenericBook("A"));
                 var expectedId = initialBook.Id;
                 initialBook.Id = Guid.NewGuid();
@@ -192,7 +192,7 @@ namespace BooksApi.UnitTests
             public void RemoveExistingEntityById()
             {
                 // Arrange
-                var service = SetupRepo(0);
+                var service = GetService(0);
                 var existingBook = service.Create(GetGenericBook("A"));
 
                 // Act
@@ -207,7 +207,7 @@ namespace BooksApi.UnitTests
             public void RemoveNonExistingEntityByIdFails()
             {
                 // Arrange
-                var service = SetupRepo(0);
+                var service = GetService(0);
                 var nonexistingBook = GetGenericBook("A");
 
                 // Act
@@ -221,7 +221,7 @@ namespace BooksApi.UnitTests
             public void RemoveExistingEntityByEntity()
             {
                 // Arrange
-                var service = SetupRepo(0);
+                var service = GetService(0);
                 var existingBook = service.Create(GetGenericBook("A"));
 
                 // Act
@@ -236,7 +236,7 @@ namespace BooksApi.UnitTests
             public void RemoveNonExistingEntityByEntityFails()
             {
                 // Arrange
-                var service = SetupRepo(0);
+                var service = GetService(0);
                 var nonexistingBook = GetGenericBook("A");
 
                 // Act
