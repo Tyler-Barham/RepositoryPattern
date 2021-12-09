@@ -200,6 +200,7 @@ namespace BooksApi.UnitTests
 
                 // Assert
                 Assert.True(success);
+                Assert.Null(service.Get(existingBook.Id.ToString()));
             }
 
             [Fact]
@@ -228,6 +229,7 @@ namespace BooksApi.UnitTests
 
                 // Assert
                 Assert.True(success);
+                Assert.Null(service.Get(existingBook.Id.ToString()));
             }
 
             [Fact]
