@@ -1,5 +1,6 @@
 ﻿using System;
 using Xunit;
+using Microsoft.Extensions.DependencyInjection;
 using BooksApi.Controllers;
 using BooksApi.Models;
 using BooksApi.Repositories;
@@ -9,6 +10,9 @@ namespace BooksApi.UnitTests.Utilities
 {
     public class Initializers
     {
+        public static ServiceProvider GetServiceProvider()
+            => (ServiceProvider)Program.BuildWebHost(new string[] { }).Services;
+
         public static BookService GetBookService(int numEntities = 0)
         {
             var repo = new RAMRepository<Book>();
