@@ -9,7 +9,7 @@ using BooksApi.Models;
 using BooksApi.Repositories;
 using BooksApi.Services;
 
-namespace BooksApi.UnitTests
+namespace BooksApi.UnitTest.AppStart
 {
     public class ServiceProviderFacts
     {
