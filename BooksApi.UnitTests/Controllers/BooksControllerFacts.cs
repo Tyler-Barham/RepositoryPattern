@@ -3,8 +3,6 @@ using Xunit;
 using Microsoft.AspNetCore.Mvc;
 using BooksApi.UnitTests.Utilities;
 
-//[assembly: CollectionBehavior(DisableTestParallelization = true)]
-
 namespace BooksApi.UnitTests.Controllers
 {
     public class BooksControllerFacts
