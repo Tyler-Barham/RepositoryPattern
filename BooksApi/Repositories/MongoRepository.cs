@@ -17,9 +17,6 @@ namespace BooksApi.Repositories
     public class MongoRepository<T, TKey> : IRepository<T, TKey>
         where T : IEntity<TKey>
     {
-        /// <summary>
-        /// MongoCollection field.
-        /// </summary>
         protected internal IMongoCollection<T> collection;
         protected internal IClientSession session;
 
@@ -35,24 +32,20 @@ namespace BooksApi.Repositories
                 database.CreateCollection(settings.CollectionName);
 
             // Get the collection
-            this.collection = database.GetCollection<T>(settings.CollectionName);
+            collection = database.GetCollection<T>(settings.CollectionName);
         }
 
         public virtual List<T> Get(Expression<Func<T, bool>> filter)
-        {
-            return this.collection.Find(filter).ToList();
-        }
+            => collection.Find(filter).ToList();
 
         public virtual T GetById(TKey id)
-        {
-            return this.collection.Find(doc => doc.Id.Equals(id)).FirstOrDefault();
-        }
+            => collection.Find(doc => doc.Id.Equals(id)).FirstOrDefault();
 
         public virtual T Add(T entity)
         {
             try
             {
-                this.collection.InsertOne(entity);
+                collection.InsertOne(entity);
             }
             catch (MongoWriteException)
             {
@@ -64,25 +57,18 @@ namespace BooksApi.Repositories
         public virtual void Add(IEnumerable<T> entities)
         {
             foreach (T entity in entities)
-                this.Add(entity);
+                Add(entity);
         }
 
         public virtual T Update(T entity)
-        {
-            var result = this.collection.ReplaceOne(doc => doc.Id.Equals(entity.Id), entity);
-
-            if (result.IsAcknowledged && result.ModifiedCount > 0)
-                return entity;
-            else
-                return default;
-        }
+            => Update(entity.Id, entity);
 
         public virtual T Update(TKey id, T entity)
         {
             if (!id.Equals(entity.Id))
                 return default;
 
-            var result = this.collection.ReplaceOne(doc => doc.Id.Equals(id), entity);
+            var result = collection.ReplaceOne(doc => doc.Id.Equals(id), entity);
 
             if (result.IsAcknowledged && result.ModifiedCount > 0)
                 return entity;
@@ -93,27 +79,18 @@ namespace BooksApi.Repositories
         public virtual void Update(IEnumerable<T> entities)
         {
             foreach (T entity in entities)
-                this.Update(entity);
+                Update(entity.Id, entity);
         }
 
         public virtual bool Delete(TKey id)
-        {
-            var result = this.collection.DeleteOne(doc => doc.Id.Equals(id));
-
-            if (result.IsAcknowledged && result.DeletedCount > 0)
-                return true;
-            else
-                return false;
-        }
+            => Delete(doc => doc.Id.Equals(id));
 
         public virtual bool Delete(T entity)
-        {
-            return this.Delete(entity.Id);
-        }
+            => Delete(doc => doc.Id.Equals(entity.Id));
 
         public virtual bool Delete(Expression<Func<T, bool>> predicate)
         {
-            var result = this.collection.DeleteMany(predicate);
+            var result = collection.DeleteMany(predicate);
 
             if (result.IsAcknowledged && result.DeletedCount > 0)
                 return true;
@@ -122,36 +99,23 @@ namespace BooksApi.Repositories
         }
 
         public virtual bool DeleteAll()
-        {
-            var result = this.collection.DeleteMany(doc => true);
-
-            if (result.IsAcknowledged && result.DeletedCount > 0)
-                return true;
-            else
-                return false;
-        }
+            => Delete(doc => true) && Count() == 0;
 
         public virtual long Count()
-        {
-            return this.collection.CountDocuments(doc => true);
-        }
+            => collection.CountDocuments(doc => true);
 
         public virtual bool Exists(Expression<Func<T, bool>> predicate)
-        {
-            return this.collection.AsQueryable<T>().Any(predicate);
-        }
+            => collection.AsQueryable().Any(predicate);
 
         public virtual IDisposable RequestStart()
         {
-            this.session = this.collection.Database.Client.StartSession();
-            this.session.StartTransaction();
-            return this.session;
+            session = collection.Database.Client.StartSession();
+            session.StartTransaction();
+            return session;
         }
 
         public virtual void RequestDone()
-        {
-            this.session.CommitTransaction();
-        }
+            => session.CommitTransaction();
 
         #region IQueryable<T>
         /// <summary>
@@ -159,25 +123,21 @@ namespace BooksApi.Repositories
         /// </summary>
         /// <returns>An IEnumerator&lt;T&gt; object that can be used to iterate through the collection.</returns>
         public virtual IEnumerator<T> GetEnumerator()
-        {
-            return this.collection.AsQueryable<T>().GetEnumerator();
-        }
+            => collection.AsQueryable().GetEnumerator();
 
         /// <summary>
         /// Returns an enumerator that iterates through a collection.
         /// </summary>
         /// <returns>An IEnumerator object that can be used to iterate through the collection.</returns>
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return this.collection.AsQueryable<T>().GetEnumerator();
-        }
+            => collection.AsQueryable().GetEnumerator();
 
         /// <summary>
         /// Gets the type of the element(s) that are returned when the expression tree associated with this instance of IQueryable is executed.
         /// </summary>
         public virtual Type ElementType
         {
-            get { return this.collection.AsQueryable<T>().ElementType; }
+            get { return collection.AsQueryable().ElementType; }
         }
 
         /// <summary>
@@ -185,7 +145,7 @@ namespace BooksApi.Repositories
         /// </summary>
         public virtual Expression Expression
         {
-            get { return this.collection.AsQueryable<T>().Expression; }
+            get { return collection.AsQueryable().Expression; }
         }
 
         /// <summary>
@@ -193,7 +153,7 @@ namespace BooksApi.Repositories
         /// </summary>
         public virtual IQueryProvider Provider
         {
-            get { return this.collection.AsQueryable<T>().Provider; }
+            get { return collection.AsQueryable().Provider; }
         }
         #endregion
     }

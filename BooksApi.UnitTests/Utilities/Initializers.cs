@@ -7,27 +7,43 @@ using BooksApi.Models;
 using BooksApi.Repositories;
 using BooksApi.Services;
 
-//[assembly: CollectionBehavior(DisableTestParallelization = true)]
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
 
 namespace BooksApi.UnitTests.Utilities
 {
     public class Initializers
     {
+        private enum RepoType
+        {
+            RAM,
+            Mongo,
+            Cassandra
+        }
+
         public static ServiceProvider GetServiceProvider()
             => (ServiceProvider)Program.BuildWebHost(new string[] { }).Services;
 
         public static BookService GetBookService(int numEntities = 0)
         {
-            
-            // For running unit tests against a mongo connection rather than in-mem repo.
-            // Tests cannot be run in parallel as they use the same instace.
-            /*
-            var config = new ConfigurationBuilder().AddJsonFile("testappsettings.json").Build();
-            var mongoSettings = config.GetSection(nameof(MongoDBSettings)).Get<MongoDBSettings>();
-            var repo = new MongoRepository<Book>(mongoSettings);
-            */
 
-            var repo = new RAMRepository<Book>();
+            IRepository<Book> repo = new RAMRepository<Book>();
+
+            // Tests cannot be run in parallel if using mongo or cassandra.
+            RepoType repoType = RepoType.RAM;
+
+            if (repoType == RepoType.Mongo)
+            {
+                var config = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json").Build();
+                var mongoSettings = config.GetSection(nameof(MongoDBSettings)).Get<MongoDBSettings>();
+                repo = new MongoRepository<Book>(mongoSettings);
+            }
+            else if (repoType == RepoType.Cassandra)
+            {
+                var config = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json").Build();
+                var cassandraSettings = config.GetSection(nameof(CassandraDBSettings)).Get<CassandraDBSettings>();
+                repo = new CassandraRepository<Book>(cassandraSettings);
+            }
+
             var service = new BookService(repo);
 
             // Ensure we have an empty repo once the service has be inited
