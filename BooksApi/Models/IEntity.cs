@@ -13,6 +13,8 @@ namespace BooksApi.Models
         /// </summary>
         /// <value>Id of the Entity.</value>
         TKey Id { get; set; }
+
+        public string ToJson();
     }
 
     /// <summary>

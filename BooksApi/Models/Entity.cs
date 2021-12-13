@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace BooksApi.Models
 {
@@ -11,6 +12,9 @@ namespace BooksApi.Models
     public abstract class Entity : IEntity<Guid>
     {
         [DataMember]
-        public virtual Guid Id { get; set; }
+        public Guid Id { get; set; }
+
+        public virtual string ToJson()
+            => JsonConvert.SerializeObject(this);
     }
 }

@@ -6,8 +6,6 @@ namespace BooksApi.Models
 {
     public class Book : Entity, IEquatable<Book>
     {
-        public override Guid Id { get; set; }
-
         [JsonProperty("Book")]
         public string BookName { get; set; }
 
@@ -58,7 +56,7 @@ namespace BooksApi.Models
         public override int GetHashCode()
             => HashCode.Combine(this.Id, this.Author, this.BookName, this.Category, this.Price);
 
-        public string ToJson()
+        public override string ToJson()
             => JsonConvert.SerializeObject(this);
     }
 }
