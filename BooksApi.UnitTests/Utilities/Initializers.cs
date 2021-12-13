@@ -50,7 +50,7 @@ namespace BooksApi.UnitTests.Utilities
                 Author = $"Author {suffix}",
                 BookName = $"Book {suffix}",
                 Category = $"Category {random.Next(0, 2)}",
-                Price = (decimal)random.NextDouble() * 100 // Random value between 0-100
+                Price = ((decimal)Math.Round(random.NextDouble() * 100, 2)) // Random value between 0-100
             };
         }
 

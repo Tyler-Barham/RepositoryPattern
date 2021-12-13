@@ -12,6 +12,10 @@ namespace BooksApi.Repositories
 
     public class CassandraDBSettings : DatabaseSettings
     {
+        public string Keyspace { get; set; }
+        public string TableName { get; set; }
+        public string TableSchema { get; set; }
+
         public void GetCassandraClientSettings() { }
     }
 
