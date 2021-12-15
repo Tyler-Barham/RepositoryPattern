@@ -39,7 +39,7 @@ namespace BooksApi.Repositories
             => collection.Find(filter).ToList();
 
         public virtual T GetById(TKey id)
-            => collection.Find(doc => doc.Id.Equals(id)).FirstOrDefault();
+            => Get(doc => doc.Id.Equals(id)).FirstOrDefault();
 
         public virtual T Add(T entity)
         {

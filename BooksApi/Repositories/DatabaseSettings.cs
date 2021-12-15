@@ -18,7 +18,6 @@ namespace BooksApi.Repositories
         public string Keyspace { get; set; }
         public string TableName { get; set; }
         public string TableSchema { get; set; }
-        public string PartitionKey { get; set; }
         public string ConnectionZip { get; set; }
 
         public void GetCassandraClientSettings() { }
