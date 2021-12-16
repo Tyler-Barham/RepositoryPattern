@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -237,7 +237,7 @@ namespace BooksApi.Repositories
     /// <typeparam name="T">The type contained in the repository.</typeparam>
     /// <remarks>Entities are assumed to use strings for Id's.</remarks>
     public class CassandraRepository<T> : CassandraRepository<T, Guid>, IRepository<T>
-        where T : IEntity<Guid>
+        where T : class, IEntity<Guid>
     {
         public CassandraRepository(CassandraDBSettings settings)
             : base(settings) { }

@@ -15,7 +15,7 @@ namespace BooksApi.Repositories
     /// <typeparam name="T">The type contained in the repository.</typeparam>
     /// <typeparam name="TKey">The type used for the entity's Id.</typeparam>
     public class MongoRepository<T, TKey> : IRepository<T, TKey>
-        where T : IEntity<TKey>
+        where T : class, IEntity<TKey>
     {
         protected internal IMongoCollection<T> collection;
         protected internal IClientSession session;
@@ -88,9 +88,9 @@ namespace BooksApi.Repositories
         public virtual bool Delete(T entity)
             => Delete(doc => doc.Id.Equals(entity.Id));
 
-        public virtual bool Delete(Expression<Func<T, bool>> predicate)
+        public virtual bool Delete(Expression<Func<T, bool>> filter)
         {
-            var result = collection.DeleteMany(predicate);
+            var result = collection.DeleteMany(filter);
 
             if (result.IsAcknowledged && result.DeletedCount > 0)
                 return true;
@@ -104,8 +104,8 @@ namespace BooksApi.Repositories
         public virtual long Count()
             => collection.CountDocuments(doc => true);
 
-        public virtual bool Exists(Expression<Func<T, bool>> predicate)
-            => collection.AsQueryable().Any(predicate);
+        public virtual bool Exists(Expression<Func<T, bool>> filter)
+            => collection.AsQueryable().Any(filter);
 
         public virtual IDisposable RequestStart()
         {
@@ -164,7 +164,7 @@ namespace BooksApi.Repositories
     /// <typeparam name="T">The type contained in the repository.</typeparam>
     /// <remarks>Entities are assumed to use strings for Id's.</remarks>
     public class MongoRepository<T> : MongoRepository<T, Guid>, IRepository<T>
-        where T : IEntity<Guid>
+        where T : class, IEntity<Guid>
     {
         public MongoRepository(MongoDBSettings settings)
             : base(settings) { }

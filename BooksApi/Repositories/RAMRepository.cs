@@ -12,7 +12,7 @@ namespace BooksApi.Repositories
     /// <typeparam name="T">The type contained in the repository.</typeparam>
     /// <typeparam name="TKey">The type used for the entity's Id.</typeparam>
     public class RAMRepository<T, TKey> : IRepository<T, TKey>
-        where T : IEntity<TKey>
+        where T : class, IEntity<TKey>
     {
         /// <summary>
         /// A collection to store all entities.
@@ -175,7 +175,7 @@ namespace BooksApi.Repositories
     /// <typeparam name="T">The type contained in the repository.</typeparam>
     /// <remarks>Entities are assumed to use strings for Id's.</remarks>
     public class RAMRepository<T> : RAMRepository<T, Guid>, IRepository<T>
-        where T : IEntity<Guid>
+        where T : class, IEntity<Guid>
     {
         public RAMRepository()
             : base() { }

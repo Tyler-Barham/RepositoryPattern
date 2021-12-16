@@ -16,7 +16,7 @@ namespace BooksApi.Repositories
     /// <typeparam name="T">The type contained in the repository.</typeparam>
     /// <typeparam name="TKey">The type used for the entity's Id.</typeparam>
     public interface IRepository<T, TKey> : IQueryable<T>
-        where T : IEntity<TKey>
+        where T : class, IEntity<TKey>
     {
         /// <summary>
         /// Returns a list of T that matches a LINQ filter.
@@ -79,10 +79,10 @@ namespace BooksApi.Repositories
         bool Delete(T entity);
 
         /// <summary>
-        /// Deletes the entities matching the predicate.
+        /// Deletes the entities matching the filter.
         /// </summary>
-        /// <param name="predicate">The expression.</param>
-        bool Delete(Expression<Func<T, bool>> predicate);
+        /// <param name="filter">The filter to determine if an entity should be deleted.</param>
+        bool Delete(Expression<Func<T, bool>> filter);
 
         /// <summary>
         /// Deletes all entities in the repository.
@@ -96,11 +96,11 @@ namespace BooksApi.Repositories
         long Count();
 
         /// <summary>
-        /// Checks if the entity exists for given predicate.
+        /// Checks if the entity exists for given filter.
         /// </summary>
-        /// <param name="predicate">The expression.</param>
-        /// <returns>True when an entity matching the predicate exists, false otherwise.</returns>
-        bool Exists(Expression<Func<T, bool>> predicate);
+        /// <param name="filter">The expression that entities must match.</param>
+        /// <returns>True when an entity matching the filter exists, false otherwise.</returns>
+        bool Exists(Expression<Func<T, bool>> filter);
 
         /// <summary>
         /// Lets the server know that this thread is about to begin a series of related operations that must all occur
@@ -139,7 +139,7 @@ namespace BooksApi.Repositories
     /// <typeparam name="T">The type contained in the repository.</typeparam>
     /// <remarks>Entities are assumed to use strings for Id's.</remarks>
     public interface IRepository<T> : IQueryable<T>, IRepository<T, Guid>
-        where T : IEntity<Guid>
+        where T : class, IEntity<Guid>
     { }
 }
 
