@@ -31,12 +31,15 @@ namespace BooksApi.Repositories
 
             string filename = "temp.zip";
 
-            // Set the Mapping Configuration
-            var mappingConfig = MappingConfiguration.Global.Define(
-               new Map<T>()
-                  .TableName(settings.TableName)
-                  .PartitionKey(nameof(IEntity.Id))
-                  .KeyspaceName(settings.Keyspace));
+            if (MappingConfiguration.Global.Get<T>() == null)
+            {
+                // Set the Mapping Configuration
+                MappingConfiguration.Global.Define(
+                    new Map<T>()
+                        .TableName(settings.TableName)
+                        .PartitionKey(nameof(IEntity.Id))
+                        .KeyspaceName(settings.Keyspace));
+            }
 
             // Generate temporary file from manifest
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(settings.ConnectionZip))
@@ -63,7 +66,7 @@ namespace BooksApi.Repositories
             //session.Execute(new SimpleStatement($"CREATE TABLE IF NOT EXISTS {settings.TableName}({settings.TableSchema}, PRIMARY KEY ({nameof(IEntity.Id)}))"));
 
             // Get reference to table
-            table = new Table<T>(session, mappingConfig);
+            table = new Table<T>(session);
         }
 
         private bool UseFilter(Expression<Func<T, bool>> filter)
@@ -86,14 +89,11 @@ namespace BooksApi.Repositories
 
         public virtual T Add(T entity)
         {
-            try
-            {
-                table.Insert(entity).Execute();
-            }
-            catch (Exception)
-            {
+            if (Exists(row => row.Id.Equals(entity.Id)))
                 return default;
-            }
+
+            table.Insert(entity).Execute();
+            
             return entity;
         }
 
@@ -111,10 +111,8 @@ namespace BooksApi.Repositories
             if (!id.Equals(entity.Id))
                 return default;
 
-            table.Where(row => row.Id.Equals(id))
-                .Select(row => row.GetCopy())
-                .Update()
-                .Execute();
+            if (Exists(row => row.Id.Equals(id)))
+                table.Insert(entity).Execute(); // Upserts
 
             return GetById(entity.Id);
         }
@@ -151,7 +149,7 @@ namespace BooksApi.Repositories
             => table.Count().Execute();
 
         public virtual bool Exists(Expression<Func<T, bool>> filter)
-            => table.Any(filter);
+            => Get(filter).Any();
 
         /// <summary>
         /// Lets the server know that this thread is about to begin a series of related operations that must all occur
