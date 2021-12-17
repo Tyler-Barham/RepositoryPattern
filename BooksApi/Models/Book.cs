@@ -55,8 +55,5 @@ namespace BooksApi.Models
 
         public override int GetHashCode()
             => HashCode.Combine(this.Id, this.Author, this.BookName, this.Category, this.Price);
-
-        public override string ToJson()
-            => JsonConvert.SerializeObject(this);
     }
 }
