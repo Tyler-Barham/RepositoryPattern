@@ -1,10 +1,13 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Cassandra;
+using Cassandra.Mapping;
 using Cassandra.Data.Linq;
 using BooksApi.Models;
+using System.IO;
+using System.Reflection;
 
 namespace BooksApi.Repositories
 {
@@ -14,154 +17,141 @@ namespace BooksApi.Repositories
     /// <typeparam name="T">The type contained in the repository.</typeparam>
     /// <typeparam name="TKey">The type used for the entity's Id.</typeparam>
     public class CassandraRepository<T, TKey> : IRepository<T, TKey>
-        where T : IEntity<TKey>
+        where T : class, IEntity<TKey>
     {
 
         protected internal ISession session;
+        protected internal CassandraDBSettings settings;
+        protected internal Table<T> table;
 
-        public CassandraRepository(CassandraDBSettings settings)
+        public CassandraRepository(CassandraDBSettings _settings)
         {
-            // Connect to db
+            // TODO Seralize this
+            settings = _settings;
+
+            string filename = "temp.zip";
+
+            // Set the Mapping Configuration
+            var mappingConfig = MappingConfiguration.Global.Define(
+               new Map<T>()
+                  .TableName(settings.TableName)
+                  .PartitionKey(nameof(IEntity.Id))
+                  .KeyspaceName(settings.Keyspace));
+
+            // Generate temporary file from manifest
+            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(settings.ConnectionZip))
+            using (var file = new FileStream(filename, FileMode.Create, FileAccess.Write))
+            {
+                stream.CopyTo(file);
+            }
+
+            // Build db connection
             session = Cluster.Builder()
-                        .WithCloudSecureConnectionBundle(@".\secure-connect-bookstoredb.zip")
-                        .WithCredentials(settings.User, settings.Password)
-                        .Build()
-                        .Connect();
-            
-            var rowSet = session.Execute($"select * from {settings.DatabaseName}");
-            Console.WriteLine(rowSet.First().GetValue<string>("key"));
+                .WithCloudSecureConnectionBundle(filename)
+                .WithCredentials(settings.User, settings.Password)
+                .WithDefaultKeyspace(settings.Keyspace)
+                .Build()
+                .Connect();
 
-            // Create table if not exists
+            // Remove file now that we no longer need it
+            File.Delete(filename);
 
-            // Get reference to the table?
+            // Prepare schema
+            // Needs to be run with db admin credentials
+            //session.Execute(new SimpleStatement($"CREATE KEYSPACE IF NOT EXISTS {settings.Keyspace} WITH replication = {{ 'class': 'SimpleStrategy', 'replication_factor': '1' }}"));
+            //session.Execute(new SimpleStatement($"USE {settings.Keyspace}"));
+            //session.Execute(new SimpleStatement($"CREATE TABLE IF NOT EXISTS {settings.TableName}({settings.TableSchema}, PRIMARY KEY ({nameof(IEntity.Id)}))"));
+
+            // Get reference to table
+            table = new Table<T>(session, mappingConfig);
         }
 
-        /// <summary>
-        /// Returns a list of T that matches a LINQ filter.
-        /// </summary>
-        /// <param name="filter">The filter that matching entities must match.</param>
-        /// <returns>A list of Entity T.</returns>
+        private bool UseFilter(Expression<Func<T, bool>> filter)
+        {
+            // Cassandra 3.17.1 cannot handle the expression "row => true".
+            var constExp = filter.Body as ConstantExpression;
+            return (constExp == null) || (!constExp.Value.Equals(true));
+        }
+
         public virtual List<T> Get(Expression<Func<T, bool>> filter)
         {
-            throw new NotImplementedException();
+            if (UseFilter(filter))
+                return table.Where(filter).Execute().ToList();
+            else
+                return table.Execute().ToList();
         }
 
-        /// <summary>
-        /// Returns the T by its given id.
-        /// </summary>
-        /// <param name="id">The Id of the entity to retrieve.</param>
-        /// <returns>The Entity T.</returns>
         public virtual T GetById(TKey id)
-        {
-            throw new NotImplementedException();
-        }
+            => Get(row => row.Id.Equals(id)).FirstOrDefault();
 
-        /// <summary>
-        /// Adds the new entity in the repository.
-        /// </summary>
-        /// <param name="entity">The entity T.</param>
-        /// <returns>The added entity including its new ObjectId.</returns>
         public virtual T Add(T entity)
         {
-            throw new NotImplementedException();
+            try
+            {
+                table.Insert(entity).Execute();
+            }
+            catch (Exception)
+            {
+                return default;
+            }
+            return entity;
         }
 
-        /// <summary>
-        /// Adds the new entities in the repository.
-        /// </summary>
-        /// <param name="entities">The entities of type T.</param>
         public virtual void Add(IEnumerable<T> entities)
         {
             foreach (T entity in entities)
-                this.Add(entity);
+                Add(entity);
         }
 
-        /// <summary>
-        /// Upserts an entity.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        /// <returns>The updated entity.</returns>
         public virtual T Update(T entity)
-        {
-            throw new NotImplementedException();
-        }
+            => Update(entity.Id, entity);
 
-        /// <summary>
-        /// Upserts an entity.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        /// <returns>The updated entity.</returns>
         public virtual T Update(TKey id, T entity)
         {
             if (!id.Equals(entity.Id))
                 return default;
 
-            throw new NotImplementedException();
+            table.Where(row => row.Id.Equals(id))
+                .Select(row => row.GetCopy())
+                .Update()
+                .Execute();
+
+            return GetById(entity.Id);
         }
 
-        /// <summary>
-        /// Upserts the entities.
-        /// </summary>
-        /// <param name="entities">The entities to update.</param>
         public virtual void Update(IEnumerable<T> entities)
         {
             foreach (T entity in entities)
-                this.Update(entity);
+                Update(entity.Id, entity);
         }
 
-        /// <summary>
-        /// Deletes an entity from the repository by its id.
-        /// </summary>
-        /// <param name="id">The entity's id.</param>
         public virtual bool Delete(TKey id)
-        {
-            throw new NotImplementedException();
-        }
+            => Delete(row => row.Id.Equals(id));
 
-        /// <summary>
-        /// Deletes the given entity.
-        /// </summary>
-        /// <param name="entity">The entity to delete.</param>
         public virtual bool Delete(T entity)
+            => Delete(row => row.Id.Equals(entity.Id));
+
+        public virtual bool Delete(Expression<Func<T, bool>> filter)
         {
-            throw new NotImplementedException();
+            if (UseFilter(filter))
+                table.Where(filter).Delete().Execute();
+            else
+                throw new InvalidQueryException($"Filter is not valid for Cassandra.Linq ({filter.ToString()})");
+            return !Get(filter).Any();
         }
 
-        /// <summary>
-        /// Deletes the entities matching the predicate.
-        /// </summary>
-        /// <param name="predicate">The expression.</param>
-        public virtual bool Delete(Expression<Func<T, bool>> predicate)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Deletes all entities in the repository.
-        /// </summary>
         public virtual bool DeleteAll()
         {
-            throw new NotImplementedException();
+            session.Execute($"TRUNCATE {settings.TableName};");
+            return Count() == 0;
         }
+          
 
-        /// <summary>
-        /// Counts the total entities in the repository.
-        /// </summary>
-        /// <returns>Count of entities in the collection.</returns>
         public virtual long Count()
-        {
-            throw new NotImplementedException();
-        }
+            => table.Count().Execute();
 
-        /// <summary>
-        /// Checks if the entity exists for given predicate.
-        /// </summary>
-        /// <param name="predicate">The expression.</param>
-        /// <returns>True when an entity matching the predicate exists, false otherwise.</returns>
-        public virtual bool Exists(Expression<Func<T, bool>> predicate)
-        {
-            throw new NotImplementedException();
-        }
+        public virtual bool Exists(Expression<Func<T, bool>> filter)
+            => table.Any(filter);
 
         /// <summary>
         /// Lets the server know that this thread is about to begin a series of related operations that must all occur
@@ -192,25 +182,21 @@ namespace BooksApi.Repositories
         /// </summary>
         /// <returns>An IEnumerator&lt;T&gt; object that can be used to iterate through the collection.</returns>
         public virtual IEnumerator<T> GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
+            => table.GetEnumerator();
 
         /// <summary>
         /// Returns an enumerator that iterates through a collection.
         /// </summary>
         /// <returns>An IEnumerator object that can be used to iterate through the collection.</returns>
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
+            => table.GetEnumerator();
 
         /// <summary>
         /// Gets the type of the element(s) that are returned when the expression tree associated with this instance of IQueryable is executed.
         /// </summary>
         public virtual Type ElementType
         {
-            get { throw new NotImplementedException(); }
+            get { return table.ElementType; }
         }
 
         /// <summary>
@@ -218,7 +204,7 @@ namespace BooksApi.Repositories
         /// </summary>
         public virtual Expression Expression
         {
-            get { throw new NotImplementedException(); }
+            get { return table.Expression; }
         }
 
         /// <summary>
@@ -226,7 +212,7 @@ namespace BooksApi.Repositories
         /// </summary>
         public virtual IQueryProvider Provider
         {
-            get { throw new NotImplementedException(); }
+            get { return table.Provider; }
         }
         #endregion
     }
