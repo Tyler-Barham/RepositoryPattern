@@ -20,14 +20,14 @@ Then install the code coverage tool globally:
 ### Running the API
 To get it up and running via the command line:
 ```sh
-> dotnet run --project ./BooksApi/BooksApi.csproj
+> dotnet run --project .\BooksApi\BooksApi.csproj
 # Navigate to localhost:5000/swagger
 ```
 
 ### Running the tests
 To run tests via the command line:
 ```sh
-> dotnet test
+> dotnet test -s .\BooksApi.UnitTests\test.runsettings
 # Example output
 Passed!  - Failed:     0, Passed:     6, Skipped:     1, Total:     7, Duration: 25 ms - BooksApi.UnitTests.dll (net5.0)
 ```

@@ -7,7 +7,7 @@ using BooksApi.Models;
 using BooksApi.Repositories;
 using BooksApi.Services;
 
-[assembly: CollectionBehavior(DisableTestParallelization = true)]
+//[assembly: CollectionBehavior(DisableTestParallelization = true)]
 
 namespace BooksApi.UnitTests.Utilities
 {

@@ -33,8 +33,8 @@ namespace BooksApi
             var cassandraSettings = Configuration.GetSection(nameof(CassandraDBSettings)).Get<CassandraDBSettings>();
 
             // Any service with IRepository<Book> in its constructor will get this repo instace
-            //services.AddSingleton<IRepository<Book>>(sp => new MongoRepository<Book>(mongoSettings));
-            services.AddSingleton<IRepository<Book>>(sp => new CassandraRepository<Book>(cassandraSettings));
+            services.AddSingleton<IRepository<Book>>(sp => new MongoRepository<Book>(mongoSettings));
+            //services.AddSingleton<IRepository<Book>>(sp => new CassandraRepository<Book>(cassandraSettings));
 
             services.AddSingleton<BookService>();
 

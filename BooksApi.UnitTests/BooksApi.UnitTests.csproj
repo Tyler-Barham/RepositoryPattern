@@ -22,5 +22,8 @@
   <ItemGroup>
     <ProjectReference Include="..\BooksApi\BooksApi.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\BooksApi\Repositories\secure-connect-bookstoredb.zip" />
+  </ItemGroup>
 
 </Project>
