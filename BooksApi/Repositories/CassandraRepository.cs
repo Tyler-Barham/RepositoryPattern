@@ -26,10 +26,9 @@ namespace BooksApi.Repositories
 
         public CassandraRepository(CassandraDBSettings _settings)
         {
-            // TODO Seralize this
             settings = _settings;
 
-            string filename = "temp.zip";
+            string filename = $"temp.{Guid.NewGuid()}.zip";
 
             if (MappingConfiguration.Global.Get<T>() == null)
             {
@@ -131,11 +130,15 @@ namespace BooksApi.Repositories
 
         public virtual bool Delete(Expression<Func<T, bool>> filter)
         {
-            if (UseFilter(filter))
-                table.Where(filter).Delete().Execute();
-            else
+            if (!UseFilter(filter))
                 throw new InvalidQueryException($"Filter is not valid for Cassandra.Linq ({filter.ToString()})");
-            return !Get(filter).Any();
+
+            // If there is nothing to delete
+            if (!Get(filter).Any())
+                return false;
+
+            table.Where(filter).Delete().Execute();
+            return !Get(filter).Any(); // Explicitly check that the delete succeeded
         }
 
         public virtual bool DeleteAll()
