@@ -1,21 +1,37 @@
 # RepositoryPattern
 
 ## About the project
-___WIP__: This project needs a summary._
+This is a smaple project with the aim of implementing MongoDB and Cassandra as repositories that can be swapped in/out with one another.
+
+
+### Databases
+All databases use the Repository pattern and implement the [IRepository](BooksApi/Repositories/IRepository.cs) interface.
+
+The types are:
+* __In-memory:__ There is an in-memory database, which is used for testing.
+* __MongoDB:__ There is a free cloud MongoDB instance hosted via Mongo Atlas in AWS' Sydney datacenter.
+* __Cassandra:__ There is a free cloud Cassandra instance hosted via Datastax AstraDB in Azures' Sydney datacenter.
 
 
 ## Getting started
 This is a `.net5.0` project. It depends on
-* NewtonsoftJson v5.x.x
-* MongoDB.Driver v2.x.x
-* CassandraCSharpDriver v3.x.x
-* NSwag v13.x.x
-* xUnit v2.X.x
+* CassandraCSharpDriver v3.17.x
+* MongoDB.Driver v2.14.x
+* NewtonsoftJson v5.0.x
+* NSwag v13.14.x
+* xUnit v2.4.x
 
-Then install the code coverage tool globally:
-```sh
-> dotnet tool install -g dotnet-reportgenerator-globaltool
-```
+To get started:
+* Run the following to download the above dependancies:
+  ```sh
+  > dotnet restore
+  ```
+* Get database instances running
+  * Signup for free cloud instances of [MongoDB](https://account.mongodb.com/account/register) or [Cassandra (via Datastax)](https://astra.datastax.com/register).
+  * Or host MongoDB/Cassandra yourself.
+* If using Cassandra, create your table (example code within the [CassandraRepository.cs](https://github.com/Tyler-Barham/RepositoryPattern/blob/bce84150b05d4bbc79149ff2205b58ada2490f23/BooksApi/Repositories/CassandraRepository.cs#L65))
+* Update the database credentials in [appsettings.Development.json](BooksApi/appsettings.Development.json)
+
 
 ### Running the API
 To get it up and running via the command line:
@@ -33,7 +49,12 @@ Passed!  - Failed:     0, Passed:     6, Skipped:     1, Total:     7, Duration:
 ```
 
 To run the tests and generate code coverage:
+
 ```sh
+# Install the code coverage tool
+> dotnet tool install -g dotnet-reportgenerator-globaltool
+
+# Run the script
 > cd .\BooksApi.UnitTests\
 > .\GenCodeCoverage.ps1
 # Example output
@@ -43,15 +64,3 @@ To run the tests and generate code coverage:
 
 # Now open .\TestResults\CoverageReport\index.html to view a detailed breakdown of coverage
 ```
-
-## Databases
-All databases use the Repository pattern and implement the [IRepository](BooksApi/Repository/IRepository.cs) interface.
-
-### In-memory
-There is an in-memory database, [RAMRepository](BooksApi/Repository/RAMRepository.cs), which is used for testing.
-
-### MongoDB
-There is a free cloud MongoDB instance hosted via Mongo Atlas in AWS' Sydney datacenter. The connection details are within [appsettings.json](BooksApi/appsettings.json) and built into a connection string within [MongoRepository.cs](BooksApi/Repository/MongoRepository.cs).
-
-### Cassandra
-There is a free cloud Cassandra instance hosted via Datastax AstraDB in Azures' Sydney datacenter. The connection details (i.e. certs) are within [this local zip](BooksApi/Repository/secure-connect-bookstoredb.zip), and user settings are within [appsettings.json](BooksApi/appsettings.json). These details are used in [CassandraRepository.cs](BooksApi/Repository/CassandraRepository.cs).
